@@ -1,6 +1,4 @@
 import pandas as pd
-import ingest_data_to_json as ingest
-import asyncio
 
 
 def transform(file) -> pd.DataFrame:
@@ -38,4 +36,3 @@ def transform(file) -> pd.DataFrame:
 
     return df
 
-# asyncio.run(ingest.main())

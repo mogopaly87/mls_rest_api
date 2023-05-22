@@ -13,10 +13,10 @@ HEADERS = ({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (K
             'Accept-Language': 'en-US, en;q=0.5'})
 
 
-list_of_href_to_details_page = []
-listings = []
+
 # Async requests
 async def get_a_tags_per_page():
+    list_of_href_to_details_page = []
     
     async with aiohttp.ClientSession() as session:
         print("Starting detailed link extraction....")
@@ -45,13 +45,14 @@ async def get_a_tags_per_page():
         print("Ended detailed links extraction!")
         print(f"Extracted {len(list_of_href_to_details_page)} links\n")
         print("Started data extraction from details pages...")
-        await ingest_data_from_details_page()
+        await ingest_data_from_details_page(list_of_href_to_details_page)
         print("\n")
         print("COMPLETED data extraction from details pages!")
         # print(data)
         
         
-async def ingest_data_from_details_page():  
+async def ingest_data_from_details_page(list_of_href_to_details_page):
+    listings = []  
     async with aiohttp.ClientSession() as session:
         # For each href that links to a detailed page for a specific lisitng:
         for link in list_of_href_to_details_page:
@@ -97,6 +98,6 @@ async def ingest_data_from_details_page():
 async def main():
     await asyncio.gather(get_a_tags_per_page())
     
-# if __name__ == "__main__":
-#     asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
     
