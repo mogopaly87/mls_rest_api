@@ -15,7 +15,7 @@ HEADERS = ({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (K
 
 
 # Async requests
-async def get_a_tags_per_page():
+async def get_a_tags_per_page(destination_file):
     list_of_href_to_details_page = []
     
     async with aiohttp.ClientSession() as session:
@@ -45,13 +45,13 @@ async def get_a_tags_per_page():
         print("Ended detailed links extraction!")
         print(f"Extracted {len(list_of_href_to_details_page)} links\n")
         print("Started data extraction from details pages...")
-        await ingest_data_from_details_page(list_of_href_to_details_page)
+        await ingest_data_from_details_page(list_of_href_to_details_page, destination_file)
         print("\n")
         print("COMPLETED data extraction from details pages!")
         # print(data)
         
         
-async def ingest_data_from_details_page(list_of_href_to_details_page):
+async def ingest_data_from_details_page(list_of_href_to_details_page, destination_file):
     listings = []  
     async with aiohttp.ClientSession() as session:
         # For each href that links to a detailed page for a specific lisitng:
@@ -91,13 +91,13 @@ async def ingest_data_from_details_page(list_of_href_to_details_page):
                 print(f"Completed:====> {link}")
                 listings.append(d)
                 
-    with open("mls_listing.json", "w") as file:
+    with open(destination_file, "w") as file:
         json.dump(listings, file)
     
 
-async def main():
-    await asyncio.gather(get_a_tags_per_page())
+async def main(destination_file):
+    await asyncio.gather(get_a_tags_per_page(destination_file))
     
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main("mls_listing.json"))
     

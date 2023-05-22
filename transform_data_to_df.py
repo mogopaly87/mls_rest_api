@@ -17,6 +17,7 @@ def transform(file) -> pd.DataFrame:
     # DATA TRANSFORMATION
     # ================================================================================================================
 
+    
     df[['mls_escape','mls_num']] = df.mls_num.str.split(":", expand=True)
     df[['city', 'province', 'postal_code']] = df.city_postal_code.str.split(",", expand=True)
     df['last_updated'] = df.last_updated.str[4:]
