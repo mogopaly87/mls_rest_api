@@ -19,12 +19,19 @@ listing = []
 async def get_a_tags_per_page():
     
     async with aiohttp.ClientSession() as session:
-        print("Started detailed link extraction....")
+        print("Starting detailed link extraction....")
+        # TODO: Use Beautiful soup to get the number of pages there are and use that number as the range below.
+        
         for i in range(1, 3):
+            # For each page, do the following:
             PAGE_URL = f"https://www.remax.ca/nl/st-johns-real-estate?pageNumber={i}"
             async with session.get(PAGE_URL, headers = HEADERS) as resp:
+                # Get the page convert it to a text format
                 body = await resp.text()
+                # Use BS4 to parse the text into HTML format that can be read by BS4.
                 soup = BeautifulSoup(body, "html.parser")
+                # Get all the a-tag links with this specific class name.
+                # N/B: This a-tag link is the link to the details page of a specific lisiting
                 links_per_page = soup.find_all("a", attrs = {'class':'listing-card_listingCard__G6M8g'})
                 
                 for link in links_per_page:
@@ -37,6 +44,8 @@ async def get_a_tags_per_page():
         print("\n")
         print("COMPLETED data extraction from details pages!")
         # print(data)
+        
+        
 async def ingest():  
     async with aiohttp.ClientSession() as session:                  
         for link in data:
@@ -79,6 +88,6 @@ async def ingest():
 async def main():
     await asyncio.gather(get_a_tags_per_page())
     
-if __name__ == "__main__":
-    asyncio.run(main())
+# if __name__ == "__main__":
+#     asyncio.run(main())
     
