@@ -13,8 +13,8 @@ HEADERS = ({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (K
             'Accept-Language': 'en-US, en;q=0.5'})
 
 
-data = []
-listing = []
+list_of_href_to_details_page = []
+listings = []
 # Async requests
 async def get_a_tags_per_page():
     
@@ -32,25 +32,34 @@ async def get_a_tags_per_page():
                 soup = BeautifulSoup(body, "html.parser")
                 # Get all the a-tag links with this specific class name.
                 # N/B: This a-tag link is the link to the details page of a specific lisiting
+                # 'links_per_page' is a list of all the links to the details page
                 links_per_page = soup.find_all("a", attrs = {'class':'listing-card_listingCard__G6M8g'})
                 
+                # For each a-tag containing link to a details page, get the 'href' (specific link) to that page.
+                # Append each 'href' to a list of hrefs for each listing. 
+                # A typical href to a details page looks like this:
+                # .......https://www.remax.ca/nl/st-john-s-real-estate/33-lynch-place-wp_idm73000004-25241747-lst
                 for link in links_per_page:
                     current_href = link.get("href")
-                    data.append(current_href)
+                    list_of_href_to_details_page.append(current_href)
         print("Ended detailed links extraction!")
-        print(f"Extracted {len(data)} links\n")
+        print(f"Extracted {len(list_of_href_to_details_page)} links\n")
         print("Started data extraction from details pages...")
-        await ingest()
+        await ingest_data_from_details_page()
         print("\n")
         print("COMPLETED data extraction from details pages!")
         # print(data)
         
         
-async def ingest():  
-    async with aiohttp.ClientSession() as session:                  
-        for link in data:
+async def ingest_data_from_details_page():  
+    async with aiohttp.ClientSession() as session:
+        # For each href that links to a detailed page for a specific lisitng:
+        for link in list_of_href_to_details_page:
+            # Get the page in a response object
             async with session.get(link, headers = HEADERS) as resp:
+                # convert the page to a text format
                 body = await resp.text()
+                # Use BS4 to parse the text into HTML format that can be read by BS4.
                 soup_detailed = BeautifulSoup(body, "html.parser")
                 price = soup_detailed.find("div", attrs = {'class': 'listing-summary_listPrice__PJawt'}).text
                 mls_num = soup_detailed.find("div", attrs = {'class': 'listing-summary_mlsNum__1PbDv'}).text 
@@ -79,10 +88,10 @@ async def ingest():
                     "price": price,
                     "last_updated": last_updated}
                 print(f"Completed:====> {link}")
-                listing.append(d)
+                listings.append(d)
                 
     with open("mls_listing.json", "w") as file:
-        json.dump(listing, file)
+        json.dump(listings, file)
     
 
 async def main():
