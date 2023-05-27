@@ -4,6 +4,8 @@ from sqlalchemy import create_engine
 from transform_data_to_df import transform
 from dotenv import load_dotenv
 import os
+import pandas as pd
+
 
 load_dotenv(dotenv_path='.env')
 
@@ -59,16 +61,15 @@ def create_mls_listing_table(conn):
                             postal_code CHAR(50))
         """
     
-    try:
-        cur = conn.cursor()
-        cur.execute(sql_create_table)
-        
-        conn.commit()
-        print("Table created successfully!")
-    except Exception as e:
-        print("Something went wrong!\n", e)
-    finally:
-        cur.close()
+    with conn as conn:
+        try:
+            cur = conn.cursor()
+            cur.execute(sql_create_table)
+            
+            conn.commit()
+            print("Table created successfully!")
+        except Exception as e:
+            print("Something went wrong!\n", e)
         
 
 def load_transformed_data_to_sql_table(dataframe, table_name, conn):
@@ -100,11 +101,11 @@ def execute_initial_data_ingestion():
 
 def get_all_mls_num_from_db():
     list_of_listing = []
-    with psycopg2.connect(database = DB_NAME, 
-                                user = DB_USER, 
-                                password = DB_PASSWORD, 
-                                host = DB_HOST,
-                                port = DB_PORT) as conn:
+    with get_postgresql_conn(DB_NAME,
+                            DB_USER,
+                            DB_PASSWORD,
+                            DB_HOST,
+                            DB_PORT) as conn:
         
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM listing")
@@ -112,6 +113,17 @@ def get_all_mls_num_from_db():
             for row in record:
                 list_of_listing.append(row[1].strip())
             return list_of_listing
+
+
+def get_current_mls_listing_on_remax(temp_file):
+    df2 = pd.read_json(temp_file)
+    df2[['mls_escape','mls_num']] = df2.mls_num.str.split(":", expand=True)
+    mls_num_list = df2['mls_num'].to_list()
+    mls_num_list = [i.strip() for i in mls_num_list]
+    
+    return mls_num_list
+
+
 
 if __name__ == '__main__':
     
