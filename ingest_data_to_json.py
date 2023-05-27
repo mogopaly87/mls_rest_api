@@ -1,8 +1,6 @@
-import os
-import requests
+
 import pandas as pd
 from bs4 import BeautifulSoup
-import pyspark as spark
 from datetime import datetime
 import asyncio
 import aiohttp
