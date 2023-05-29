@@ -89,7 +89,8 @@ def create_mls_listing_table(conn) -> None:
                             city VARCHAR(200),
                             province CHAR(50),
                             postal_code CHAR(50),
-                            link VARCHAR(255));
+                            link VARCHAR(255),
+                            status CHAR(50));
         """
     
     with conn as conn:
@@ -108,12 +109,10 @@ def load_new_data(dataframe, table_name, conn) -> None:
     Args:
         dataframe (pandas dataframe): Dataframe of transformed data
         table_name (string): Destination table name
-    
-    conn (Connection): 
-                    SqlAlchemy connection object
+        conn (Connection): SqlAlchemy connection object
     """
     with conn as conn:
-        dataframe.to_sql(table_name, conn)
+        dataframe.to_sql(table_name, conn, if_exists='append', index=False)
         print("New data loaded successfully!")
         
     
@@ -128,7 +127,7 @@ def load_transformed_data_to_sql_table(dataframe, table_name, conn) -> None:
                     SqlAlchemy connection object
     """
     with conn as conn:
-        dataframe.to_sql(table_name, conn, if_exists='replace')
+        dataframe.to_sql(table_name, conn, if_exists='replace', index=False)
         print("Data loaded successfully!")
     
 

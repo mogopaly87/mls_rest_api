@@ -4,14 +4,7 @@ import transform_data_to_df as trf
 
 
 def update_table():
-    # If the mls numbers in the database is not the same as the ones on Remax website:
-    # This could mean two things:
-    # 1) The database has an mls record that does not exist on remax which indicates a listing has been removed.
-    # 2) Remax website has an mls record that does not exist in the database which indicates a listing has been added.
-    # if not util.get_data_difference_by_mls_number():
-    #     print('False')
-    # else:
-    #     print('True')
+    
     sql_alc_conn_string = os.getenv('SQL_ALCHEMY_CONN_STRING')
     sql_alc_conn = util.get_sql_alchemy_engine(sql_alc_conn_string)
     

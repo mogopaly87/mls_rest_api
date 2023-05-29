@@ -96,7 +96,8 @@ async def ingest_data_from_details_page(list_of_href_to_details_page, destinatio
                     "property_type": property_type, 
                     "price": price,
                     "last_updated": last_updated,
-                    "link": link}
+                    "link": link,
+                    "status": "Active"}
                 print(f"Completed:====> {link}")
                 listings.append(d)
                 
