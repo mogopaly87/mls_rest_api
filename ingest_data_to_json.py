@@ -60,22 +60,32 @@ async def ingest_data_from_details_page(list_of_href_to_details_page, destinatio
                 body = await resp.text()
                 # Use BS4 to parse the text into HTML format that can be read by BS4.
                 soup_detailed = BeautifulSoup(body, "html.parser")
+                
                 price = soup_detailed.find("div", attrs = {'class': 'listing-summary_listPrice__PJawt'}).text
                 mls_num = soup_detailed.find("div", attrs = {'class': 'listing-summary_mlsNum__1PbDv'}).text 
                 address_street = soup_detailed.find("span", attrs = {'class': 'listing-address_splitLines__pLZIy'}).text 
-                city_postal_code = soup_detailed.find("span", attrs = {'class': 'listing-summary_cityLine__YxXgL listing-address_splitLines__pLZIy'}).text 
-                num_of_beds = soup_detailed.find("span", attrs = {'data-cy': 'property-beds'}).find("span", attrs = {'class': 'listing-summary_propertyDetailValue__UOUcR'}).text
-                num_of_baths = soup_detailed.find("span", attrs = {'data-cy': 'property-baths'}).find("span", attrs = {'class': 'listing-summary_propertyDetailValue__UOUcR'}).text
+                city_postal_code = soup_detailed.find("span", 
+                                                        attrs = {'class': 'listing-summary_cityLine__YxXgL listing-address_splitLines__pLZIy'}).text 
+                num_of_beds = soup_detailed.find("span", 
+                                                    attrs = {'data-cy': 'property-beds'}).find("span", 
+                                                    attrs = {'class': 'listing-summary_propertyDetailValue__UOUcR'}).text
+                num_of_baths = soup_detailed.find("span", 
+                                                    attrs = {'data-cy': 'property-baths'}).find("span", 
+                                                    attrs = {'class': 'listing-summary_propertyDetailValue__UOUcR'}).text
                 
                 # If the property has a sqft value, assign that value to the variable 'sqft'
-                if len(soup_detailed.find("section", attrs = {'id': 'details'}).find_all("ul")[1].find_all("li")) > 1:
-                    sqft = soup_detailed.find("section", attrs = {'id': 'details'}).find_all("ul")[1].find_all("li")[1].find_all("span")[1].text
+                if len(soup_detailed.find("section", 
+                                            attrs = {'id': 'details'}).find_all("ul")[1].find_all("li")) > 1:
+                    sqft = soup_detailed.find("section", 
+                                                attrs = {'id': 'details'}).find_all("ul")[1].find_all("li")[1].find_all("span")[1].text
                 else:
                     # If the property does not have a sqft value, assign the value of 'N/A' to the variable 'sqft'
                     sqft = "N/A"
                 
-                property_type = soup_detailed.find("section", attrs = {'id': 'details'}).find_all("ul")[1].find_all("li")[0].find_all("span")[1].text
-                last_updated = soup_detailed.find("section", attrs = {'id': 'details'}).find_all("ul")[0].find_all("li")[1].find_all("span")[1].text
+                property_type = soup_detailed.find("section", 
+                                                    attrs = {'id': 'details'}).find_all("ul")[1].find_all("li")[0].find_all("span")[1].text
+                last_updated = soup_detailed.find("section", 
+                                                    attrs = {'id': 'details'}).find_all("ul")[0].find_all("li")[1].find_all("span")[1].text
                     
                 d = {"mls_num": mls_num, 
                     "address_street": address_street, 
@@ -85,7 +95,8 @@ async def ingest_data_from_details_page(list_of_href_to_details_page, destinatio
                     "sqft": sqft, 
                     "property_type": property_type, 
                     "price": price,
-                    "last_updated": last_updated}
+                    "last_updated": last_updated,
+                    "link": link}
                 print(f"Completed:====> {link}")
                 listings.append(d)
                 

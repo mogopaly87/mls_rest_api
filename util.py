@@ -86,7 +86,8 @@ def create_mls_listing_table(conn) -> None:
                             last_updated DATE,
                             city VARCHAR(200),
                             province CHAR(50),
-                            postal_code CHAR(50))
+                            postal_code CHAR(50),
+                            link VARCHAR(255))
         """
     
     with conn as conn:
