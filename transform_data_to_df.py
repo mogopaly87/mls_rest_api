@@ -19,6 +19,7 @@ def transform(file) -> pd.DataFrame:
 
     
     df[['mls_escape','mls_num']] = df.mls_num.str.split(":", expand=True)
+    df['mls_num'] = df.mls_num.str.strip()
     df[['city', 'province', 'postal_code']] = df.city_postal_code.str.split(",", expand=True)
     df['last_updated'] = df.last_updated.str[4:]
     df.drop(columns=['city_postal_code', 'mls_escape',], axis=1, inplace=True)

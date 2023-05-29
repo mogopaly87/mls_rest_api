@@ -6,6 +6,7 @@ from sqlalchemy.engine import Connection
 from dotenv import load_dotenv
 import os
 import pandas as pd
+import numpy as np
 import collections
 from transform_data_to_df import transform
 
@@ -76,6 +77,7 @@ def create_mls_listing_table(conn) -> None:
     
     """
     sql_create_table = """
+        DROP TABLE IF EXISTS listing;
         CREATE TABLE listing(mls_num CHAR(50) PRIMARY KEY,
                             address_street VARCHAR(200),
                             num_of_beds int,
@@ -87,7 +89,7 @@ def create_mls_listing_table(conn) -> None:
                             city VARCHAR(200),
                             province CHAR(50),
                             postal_code CHAR(50),
-                            link VARCHAR(255))
+                            link VARCHAR(255));
         """
     
     with conn as conn:
@@ -100,7 +102,21 @@ def create_mls_listing_table(conn) -> None:
         except Exception as e:
             print("Something went wrong!\n", e)
         
+def load_new_data(dataframe, table_name, conn) -> None:
+    """Loads new data in a dataframe into a sql table
 
+    Args:
+        dataframe (pandas dataframe): Dataframe of transformed data
+        table_name (string): Destination table name
+    
+    conn (Connection): 
+                    SqlAlchemy connection object
+    """
+    with conn as conn:
+        dataframe.to_sql(table_name, conn)
+        print("New data loaded successfully!")
+        
+    
 def load_transformed_data_to_sql_table(dataframe, table_name, conn) -> None:
     """Loads transformed data in a dataframe into a sql table
 
@@ -113,6 +129,7 @@ def load_transformed_data_to_sql_table(dataframe, table_name, conn) -> None:
     """
     with conn as conn:
         dataframe.to_sql(table_name, conn, if_exists='replace')
+        print("Data loaded successfully!")
     
 
 def execute_initial_data_ingestion():
@@ -161,13 +178,30 @@ def get_current_mls_listing_on_remax_by_number():
     return mls_num_list
 
 
-def is_mls_num_data_unchanged() -> bool:
+def get_data_difference_by_mls_number() -> dict:
+    """Gets and returns the mls numbers for listings that are now removed and
+    listings that are new.
+
+    Returns:
+        dict:   This is a dictionary with two keys and two sets of values.
+                The first key ('new_data') is a list of MLS numbers that represent new listings on the
+                Remax website but are not in the database. 
+                
+                The second key ('stale_data') is a list of MLS numbers that represent listings in the database
+                that no longer exist on Remax website (we assume the 'stale_data' to have been removed
+                from Remax)
+    """
+    status = {'new_data':[],
+                'stale_data':[]}
     
     db_mls_listing = get_all_mls_num_from_db()
     mls_num_list = get_current_mls_listing_on_remax_by_number()
-    status = False
-    if collections.Counter(db_mls_listing) == collections.Counter(mls_num_list):
-        status = True
+    
+    new_data = list(np.setdiff1d(mls_num_list, db_mls_listing))
+    stale_data = list(np.setdiff1d(db_mls_listing, mls_num_list))
+    
+    status['new_data'] = new_data
+    status['stale_data'] = stale_data
     
     return status
 
