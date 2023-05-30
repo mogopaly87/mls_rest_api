@@ -166,7 +166,7 @@ def get_all_mls_num_from_db():
             cur.execute("SELECT * FROM listing")
             record = cur.fetchall()
             for row in record:
-                list_of_listing.append(row[1].strip())
+                list_of_listing.append(row[0].strip())
             return list_of_listing
 
 
