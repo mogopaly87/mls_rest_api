@@ -2,6 +2,8 @@ from psycopg2._psycopg import connection
 import psycopg2
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection
+import ingest_data_to_json as ingest
+import asyncio
 
 from dotenv import load_dotenv
 import os
@@ -204,7 +206,12 @@ def get_data_difference_by_mls_number() -> dict:
     
     return status
 
-
+def download_main_data():
+    ingest.download_main_data_file()
+    
+    
+def download_temp_data():
+    ingest.download_temp_file()
 
 if __name__ == '__main__':
     

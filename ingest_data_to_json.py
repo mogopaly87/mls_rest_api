@@ -108,6 +108,13 @@ async def ingest_data_from_details_page(list_of_href_to_details_page, destinatio
 async def main(destination_file):
     await asyncio.gather(get_a_tags_per_page(destination_file))
     
-if __name__ == "__main__":
-    asyncio.run(main("mls_listing.json"))
+def download_temp_file():
+    asyncio.run(main('mls_temp_data.json'))
+    
+
+def download_main_data_file():
+    asyncio.run(main('mls_main_data.json'))
+    
+# if __name__ == "__main__":
+#     asyncio.run(main("mls_listing.json"))
     
