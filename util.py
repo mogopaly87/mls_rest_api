@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 import os
 import pandas as pd
 import numpy as np
-import collections
 from transform_data_to_df import transform
 
 # Load environment variables from the .env file. 
@@ -21,6 +20,7 @@ DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
+SQL_ALCHEMY_CONN_STRING = os.getenv('SQL_ALCHEMY_CONN_STRING')
 
 
 def get_sql_alchemy_engine(conn_string) -> Connection:
@@ -147,7 +147,7 @@ def execute_initial_data_ingestion():
     sql_alc_conn = get_sql_alchemy_engine(sql_alc_conn_string)
     
     
-    df = transform('mls_listing.json')
+    df = transform('mls_main_data.json')
     # print(f"\n{df.head(5)}")
     
     load_transformed_data_to_sql_table(df, 'listing', sql_alc_conn)
@@ -213,6 +213,3 @@ def download_main_data():
 def download_temp_data():
     ingest.download_temp_file()
 
-if __name__ == '__main__':
-    
-    execute_initial_data_ingestion()

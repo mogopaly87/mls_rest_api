@@ -35,6 +35,7 @@ def transform(file) -> pd.DataFrame:
     df['sqft'] = df['sqft'].str.replace(',', '')
     df[['sqft', 'num_of_beds']] = df[['sqft', 'num_of_beds']].replace('N/A', '0')
     df[['num_of_baths', 'num_of_beds', 'sqft', 'price']] = df[['num_of_baths', 'num_of_beds', 'sqft', 'price']].astype(int)
-
+    df.loc[df['city'] == "St.John\'s",'city'] = "St. John\'s"
+    df.loc[df['city'] == "St. Johns",'city'] = "St. John\'s"
     return df
 

@@ -3,7 +3,7 @@ import os
 import transform_data_to_df as trf
 
 
-def update_table():
+def add_new_or_update_listing_status():
     
     sql_alc_conn_string = os.getenv('SQL_ALCHEMY_CONN_STRING')
     sql_alc_conn = util.get_sql_alchemy_engine(sql_alc_conn_string)
@@ -39,4 +39,3 @@ def update_table():
                             """)
             conn.commit()
 
-update_table()
