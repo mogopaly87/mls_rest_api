@@ -15,7 +15,7 @@ def add_new_or_update_listing_status():
     # If there is new data on Remax website then do this:
     if len(status['new_data']) >= 1:
         new_data = status['new_data']
-        df = trf.transform('mls_temp.json')
+        df = trf.transform('mls_temp_data.json')
         df_filtered = df.query("mls_num in @new_data")
         
         util.load_new_data(df_filtered, 'listing', sql_alc_conn)

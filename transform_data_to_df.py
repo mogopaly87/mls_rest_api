@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def transform(file) -> pd.DataFrame:
@@ -34,8 +35,17 @@ def transform(file) -> pd.DataFrame:
     df['postal_code'] = df['postal_code'].str.upper()
     df['sqft'] = df['sqft'].str.replace(',', '')
     df[['sqft', 'num_of_beds']] = df[['sqft', 'num_of_beds']].replace('N/A', '0')
+    
+    try:
+        df['sqft'] = pd.to_numeric(df['sqft'], errors='coerce')
+    except:
+        df['sqft'] = df['sqft'].replace(np.nan, 0)
+    
+    df['sqft'] = df['sqft'].replace(np.nan, 0)
+    df[['num_of_baths', 'num_of_beds', 'sqft', 'price']] = df[['num_of_baths', 'num_of_beds', 'sqft', 'price']].replace('', 0)
     df[['num_of_baths', 'num_of_beds', 'sqft', 'price']] = df[['num_of_baths', 'num_of_beds', 'sqft', 'price']].astype(int)
     df.loc[df['city'] == "St.John\'s",'city'] = "St. John\'s"
     df.loc[df['city'] == "St. Johns",'city'] = "St. John\'s"
+    df['province'] = df['province'].str.strip()
     return df
 
