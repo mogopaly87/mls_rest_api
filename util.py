@@ -20,7 +20,7 @@ DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
-SQL_ALCHEMY_CONN_STRING = os.getenv('SQL_ALCHEMY_CONN_STRING')
+SQL_ALCHEMY_CONN_STRING = os.getenv('SQL_ALCHEMY_CONN_STRING_LOCAL')
 
 
 def get_sql_alchemy_engine(conn_string) -> Connection:
@@ -119,7 +119,7 @@ def load_new_data(dataframe, table_name, conn) -> None:
         print("New data loaded successfully!")
         
     
-def load_transformed_data_to_sql_table(dataframe, table_name, conn) -> None:
+def load_transformed_data_to_sql_table() -> None:
     """Loads transformed data in a dataframe into a sql table
 
     Args:
@@ -129,8 +129,16 @@ def load_transformed_data_to_sql_table(dataframe, table_name, conn) -> None:
     conn (Connection): 
                     SqlAlchemy connection object
     """
+    print(f'The alchemy string is >>>>> {SQL_ALCHEMY_CONN_STRING}')
+    db = create_engine(SQL_ALCHEMY_CONN_STRING)
+    conn = db.connect()
+    conn.autocommit = True
     with conn as conn:
-        dataframe.to_sql(table_name, conn, if_exists='replace', index=False)
+        
+        df = transform('mls_main_data.json')
+        print("Transformation completed successfully!\n")
+        print(df.head(3))
+        df.to_sql('listing', conn, if_exists='replace', index=False)
         print("Data loaded successfully!")
     
 
@@ -144,15 +152,9 @@ def execute_initial_data_ingestion():
     
     create_mls_listing_table(postgres_conn)
     
-    sql_alc_conn_string = os.getenv('SQL_ALCHEMY_CONN_STRING')
-    sql_alc_conn = get_sql_alchemy_engine(sql_alc_conn_string)
+    load_transformed_data_to_sql_table()
     
-    
-    df = transform('mls_main_data.json')
-    # print(f"\n{df.head(5)}")
-    
-    load_transformed_data_to_sql_table(df, 'listing', sql_alc_conn)
-    
+
 
 
 def get_all_mls_num_from_db():
@@ -213,4 +215,6 @@ def download_main_data():
     
 def download_temp_data():
     ingest.download_temp_file()
+
+
 
