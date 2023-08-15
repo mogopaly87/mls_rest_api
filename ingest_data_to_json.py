@@ -79,7 +79,7 @@ async def get_a_tags_per_page(destination_file):
         print(f"Extracted {len(list_of_href_to_details_page)} links\n")
         print("Started data extraction from details pages...")
         await ingest_data_from_details_page(list_of_href_to_details_page, destination_file)
-        print("\n")
+        print("\n")     
         print("COMPLETED data extraction from details pages!")
         # print(data)
         
