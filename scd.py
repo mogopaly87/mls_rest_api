@@ -16,6 +16,7 @@ def add_new_or_update_listing_status():
     if len(status['new_data']) >= 1:
         new_data = status['new_data']
         df = trf.transform('mls_temp_data.json')
+        print("Adding new data to database")
         df_filtered = df.query("mls_num in @new_data")
         
         util.load_new_data(df_filtered, 'listing', sql_alc_conn)
@@ -31,6 +32,7 @@ def add_new_or_update_listing_status():
         
         with conn as conn:
             cur = conn.cursor()
+            print("Updating stale data")
             for mls_num in status['stale_data']:
                 cur.execute(f"""
                             UPDATE listing

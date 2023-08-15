@@ -3,6 +3,7 @@ from transform_data_to_df import transform
 from dotenv import load_dotenv
 import os
 from sqlalchemy import create_engine
+from scd import add_new_or_update_listing_status
 
 load_dotenv(dotenv_path='.env')
 SQL_ALCHEMY_CONN_STRING = os.getenv('SQL_ALCHEMY_CONN_STRING')
@@ -20,3 +21,4 @@ SQL_ALCHEMY_CONN_STRING = os.getenv('SQL_ALCHEMY_CONN_STRING')
 execute_initial_data_ingestion()
 # util.load_transformed_data_to_sql_table()
 
+# add_new_or_update_listing_status()

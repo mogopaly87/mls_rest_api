@@ -1,5 +1,6 @@
 from psycopg2._psycopg import connection
 import psycopg2
+from psycopg2 import pool
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection
 import ingest_data_to_json as ingest
@@ -20,7 +21,7 @@ DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
-SQL_ALCHEMY_CONN_STRING = os.getenv('SQL_ALCHEMY_CONN_STRING_LOCAL')
+SQL_ALCHEMY_CONN_STRING = os.getenv('SQL_ALCHEMY_CONN_STRING')
 
 
 def get_sql_alchemy_engine(conn_string) -> Connection:
@@ -57,15 +58,22 @@ def get_postgresql_conn(db_name,
         connection: A connection object using pyscopg2
     """
     try:
-        conn = psycopg2.connect(database = DB_NAME, 
-                            user = DB_USER, 
-                            password = DB_PASSWORD, 
-                            host = DB_HOST,
-                            port = DB_PORT)
+        psql_pool = pool.SimpleConnectionPool(1, 20, 
+                                                database = db_name, 
+                                                user = db_user, 
+                                                password = db_pass, 
+                                                host = db_host,
+                                                port = db_port)
+        conn = psql_pool.getconn()
+        # conn = psycopg2.connect(database = DB_NAME, 
+        #                     user = DB_USER, 
+        #                     password = DB_PASSWORD, 
+        #                     host = DB_HOST,
+        #                     port = DB_PORT)
         print("Database connected successfully!")
         return conn
-    except:
-        print("Database not connected")
+    except (Exception, psycopg2.DatabaseError) as e:
+        print("Database not connected\n", e)
     
     
 
@@ -130,7 +138,7 @@ def load_transformed_data_to_sql_table() -> None:
                     SqlAlchemy connection object
     """
     print(f'The alchemy string is >>>>> {SQL_ALCHEMY_CONN_STRING}')
-    db = create_engine(SQL_ALCHEMY_CONN_STRING)
+    db = create_engine(SQL_ALCHEMY_CONN_STRING, pool_size=20, max_overflow=0)
     conn = db.connect()
     conn.autocommit = True
     with conn as conn:
@@ -174,7 +182,7 @@ def get_all_mls_num_from_db():
 
 
 def get_current_mls_listing_on_remax_by_number():
-    df2 = pd.read_json('mls_temp.json')
+    df2 = pd.read_json('mls_temp_data.json')
     df2[['mls_escape','mls_num']] = df2.mls_num.str.split(":", expand=True)
     mls_num_list = df2['mls_num'].to_list()
     mls_num_list = [i.strip() for i in mls_num_list]
