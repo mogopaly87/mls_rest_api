@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2 import pool
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection
-import ingest_data_to_json as ingest
+import get_all_listing_urls as ingest
 import asyncio
 
 from dotenv import load_dotenv
